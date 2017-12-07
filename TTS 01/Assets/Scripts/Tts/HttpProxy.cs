@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+//using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using UnityEngine;
 
@@ -91,16 +91,19 @@ namespace ConsoleApp1
                 httpWebRequest.Method = method;
                 httpWebRequest.Accept = accept;
                 httpWebRequest.ContentType = content_type;
-                MethodInfo priMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
-                priMethod.Invoke(httpWebRequest.Headers, new[] { "Date", date });
-                httpWebRequest.Headers.Add("Authorization", authHeader);
+                //httpWebRequest.Data
+                MethodInfo priDateMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+                priDateMethod.Invoke(httpWebRequest.Headers, new[] { "Date", date });
+                //httpWebRequest.Authorization
+                MethodInfo priAuthorizationMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+                priAuthorizationMethod.Invoke(httpWebRequest.Headers, new[] { "Authorization", authHeader });
                 byte[] bt = Encoding.UTF8.GetBytes(body);
-                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
-                httpWebRequest.ContentLength = bt.Length;
+                //httpWebRequest.ContentLength
+                MethodInfo priLengthMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+                priLengthMethod.Invoke(httpWebRequest.Headers, new[] { "ContentLength", bt.Length.ToString() });
+                //httpWebRequest.ContentLength = bt.Length;
+                //ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
                 httpWebRequest.ServicePoint.UseNagleAlgorithm = true;
-                // ServicePointManager
-
-
 
                 httpWebRequest.GetRequestStream().Write(bt, 0, bt.Length);
 
@@ -127,10 +130,10 @@ namespace ConsoleApp1
             return result;
         }
 
-        public static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
-        { // Always accept
-            //Debug.Log("accept" + certificate.GetName());
-            return true; //总是接受
-        }
+        //public static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        //{ // Always accept
+        //    Debug.Log("accept" + certificate.GetName());
+        //    return true; //总是接受
+        //}
     }
 }

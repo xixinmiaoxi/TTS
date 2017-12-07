@@ -86,14 +86,20 @@ namespace ConsoleApp1
                 // 3.得到 authorization header
                 String authHeader = "Dataplus " + ak_id + ":" + signature;
 
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(realUrl);
+                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(realUrl);
                 httpWebRequest.Method = method;
                 httpWebRequest.Accept = accept;
                 httpWebRequest.ContentType = content_type;
-                MethodInfo priMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
-                priMethod.Invoke(httpWebRequest.Headers, new[] { "Date", date });
-                httpWebRequest.Headers.Add("Authorization", authHeader);
-                httpWebRequest.ContentLength = audioData.Length;
+                MethodInfo priDateMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+                priDateMethod.Invoke(httpWebRequest.Headers, new[] { "Date", date });
+                MethodInfo priAuthorizationMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+                priAuthorizationMethod.Invoke(httpWebRequest.Headers, new[] { "Authorization", authHeader });
+                //httpWebRequest.Headers.Add("Authorization", authHeader);
+
+                //httpWebRequest.ContentLength
+                MethodInfo priLengthMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+                priLengthMethod.Invoke(httpWebRequest.Headers, new[] { "ContentLength", audioData.Length.ToString() });
+                //httpWebRequest.ContentLength = audioData.Length;
 
                 httpWebRequest.GetRequestStream().Write(audioData, 0, audioData.Length);
 
@@ -110,7 +116,7 @@ namespace ConsoleApp1
                     Debug.Log("response: " + responseContent);
                     response.setMassage("OK");
 
-                    string savePath = @"D:\1.Txt";    //本地保存路径
+                    //string savePath = @"D:\1.Txt";    //本地保存路径
 
                     //FileStream fs = new FileStream(savePath, FileMode.Append);
                     //var buff = Encoding.Unicode.GetBytes(responseContent);
@@ -160,12 +166,18 @@ namespace ConsoleApp1
             httpWebRequest.Method = method;
             httpWebRequest.Accept = accept;
             httpWebRequest.ContentType = content_type;
+            //httpWebRequest.Date
+            MethodInfo priDateMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+            priDateMethod.Invoke(httpWebRequest.Headers, new[] { "Date", date });
 
-            MethodInfo priMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
-            priMethod.Invoke(httpWebRequest.Headers, new[] { "Date", date });
+            //httpWebRequest.Authorization
+            MethodInfo priAuthorizationMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+            priAuthorizationMethod.Invoke(httpWebRequest.Headers, new[] { "Authorization", authHeader });
 
-            httpWebRequest.Headers.Add("Authorization", authHeader);
-            httpWebRequest.ContentLength = Encoding.UTF8.GetBytes(textData).Length;
+            //httpWebRequest.ContentLength
+            MethodInfo priLengthMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
+            priLengthMethod.Invoke(httpWebRequest.Headers, new[] { "ContentLength", Encoding.UTF8.GetBytes(textData).Length.ToString() });
+            //httpWebRequest.ContentLength = Encoding.UTF8.GetBytes(textData).Length;
 
             httpWebRequest.GetRequestStream().Write(Encoding.UTF8.GetBytes(textData), 0, Encoding.UTF8.GetBytes(textData).Length);
 

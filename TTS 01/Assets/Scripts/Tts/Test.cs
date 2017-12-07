@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class Test : MonoBehaviour
 {
     MicrophoneTest MTest;
@@ -68,6 +69,12 @@ public class Test : MonoBehaviour
         }
         flag = true;
         string path = @"D:/1.wav";
+        //        string path;
+        //#if !NETFX_CORE   //UWP下  
+        //        path = @"D:/1.wav";
+        //#else
+        //        path = ApplicationData.Current.LocalFolder+"/1.wav";
+        //#endif
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
@@ -85,6 +92,12 @@ public class Test : MonoBehaviour
         }
         flag = true;
         string path = @"D:/2.wav";
+        //        string path;
+        //#if !NETFX_CORE   //UWP下  
+        //        path = @"D:/2.wav";
+        //#else
+        //        path = ApplicationData.Current.LocalFolder+"/2.wav";
+        //#endif
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
@@ -102,6 +115,12 @@ public class Test : MonoBehaviour
         }
         flag = true;
         string path = @"D:/3.wav";
+        //        string path;
+        //#if !NETFX_CORE   //UWP下  
+        //        path = @"D:/3.wav";
+        //#else
+        //        path = ApplicationData.Current.LocalFolder+"/3.wav";
+        //#endif
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
@@ -119,6 +138,12 @@ public class Test : MonoBehaviour
         }
         flag = true;
         string path = @"D:/4.wav";
+        //        string path;
+        //#if !NETFX_CORE   //UWP下  
+        //        path = @"D:/4.wav";
+        //#else
+        //        path = ApplicationData.Current.LocalFolder+"/4.wav";
+        //#endif
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
@@ -136,6 +161,12 @@ public class Test : MonoBehaviour
         }
         flag = true;
         string path = @"D:/5.wav";
+        //        string path;
+        //#if !NETFX_CORE   //UWP下  
+        //        path = @"D:/5.wav";
+        //#else
+        //        path = ApplicationData.Current.LocalFolder+"/5.wav";
+        //#endif
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
