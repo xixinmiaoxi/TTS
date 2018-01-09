@@ -204,12 +204,6 @@ namespace ConsoleApp1
             }
             return response;
         }
-
-        public static bool GMTStrParse(string gmtStr, out DateTime gmtTime)
-        {
-            CultureInfo enUS = new CultureInfo("en-US");
-            bool s = DateTime.TryParseExact(gmtStr, "r", enUS, DateTimeStyles.None, out gmtTime);
-            return s;
-        }
+        
     }
 }
