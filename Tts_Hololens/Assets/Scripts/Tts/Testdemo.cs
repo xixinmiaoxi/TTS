@@ -17,6 +17,7 @@ using System.Security.Cryptography;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
+using System.Threading.Tasks;
 #else 
 using System;
 using System.Collections;
@@ -34,8 +35,6 @@ public class Testdemo : MonoBehaviour
 {
     void Start()
     {
-
-
         String url = "http://nlsapi.aliyun.com/speak?";
         String ak_id = "LTAIr8I8A5HNZvdt";
         String ak_secret = "rBSsm6hewfAcSH6oeA6VXF6PCAACGD";
@@ -67,21 +66,19 @@ public class Testdemo : MonoBehaviour
 
 
         string fileName = System.Guid.NewGuid().ToString("N");
-
-        //StartCoroutine(IEPost(tts_text, ttsRequest.getEncodeType(), fileName, ttsUrlSpeak, ak_id, ak_secret));
-        IEPost(tts_text, ttsRequest.getEncodeType(), fileName, ttsUrlSpeak, ak_id, ak_secret);
+        string TextStr;
+        WriteLog("Start", 1);
+        TextStr = IEPost(tts_text, ttsRequest.getEncodeType(), fileName, ttsUrlSpeak, ak_id, ak_secret).Result;
+        WriteLog("End", 2);
+        GameObject text = GameObject.Find("Canvas/Text");
+        text.GetComponent<Text>().text = TextStr;
+        WriteLog("Final", 3);
     }
 
-    public static String ToGMTString(DateTime date)
+    private async Task<String> IEPost(String textData, String audioType, String audioName, String url, String ak_id, String ak_secret)
     {
-        string dateString = date.ToString("r");
-        return dateString;
-    }
+        Uri realUrl = new Uri(url);
 
-    private async void IEPost(String textData, String audioType, String audioName, String url, String ak_id, String ak_secret)
-    {
-        //HttpResponse response = HttpUtil.sendTtsPost(content, ttsRequest.getEncodeType(), fileName, ttsUrlSpeak, ak_id, ak_secret);
-        HttpResponse response = new HttpResponse();
         String method = "POST";
         String content_type = "text/plain";
         String accept = "audio/" + audioType;// + ",application/json";
@@ -89,6 +86,10 @@ public class Testdemo : MonoBehaviour
 
         DateTime time = DateTime.UtcNow;
         string date = ToGMTString(time);
+
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        //注册GBK编码
+        Encoding encodingUtf8 = Encoding.UTF8;
 
         // 1.对body做MD5+BASE64加密
         String bodyMd5 = MD5Base64(Encoding.UTF8.GetBytes(textData));
@@ -98,54 +99,106 @@ public class Testdemo : MonoBehaviour
         // 3.得到 authorization header
         String authHeader = "Dataplus " + ak_id + ":" + signature;
 
-        HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-        httpWebRequest.Method = method;
-        httpWebRequest.Accept = accept;
-        httpWebRequest.ContentType = content_type;
-        httpWebRequest.Headers["Date"] = date;
-        httpWebRequest.Headers["Authorization"] = authHeader;
-        httpWebRequest.Headers["ContentLength"] = Encoding.UTF8.GetBytes(textData).Length.ToString();
+        //HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+        //httpWebRequest.Method = method;
+        //httpWebRequest.Accept = accept;
+        //httpWebRequest.ContentType = content_type;
+        //httpWebRequest.Headers["Date"] = date;
+        //httpWebRequest.Headers["Authorization"] = authHeader;
+        //httpWebRequest.Headers["ContentLength"] = Encoding.UTF8.GetBytes(textData).Length.ToString();
+        //WriteLog("Before", 4);
+        //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        ////注册GBK编码
+        //Encoding encodingUnicode = Encoding.Unicode;
+        //WriteLog("Send", 5);
+        //var stream = await httpWebRequest.GetRequestStreamAsync();
+        //await stream.WriteAsync(Encoding.UTF8.GetBytes(textData), 0, Encoding.UTF8.GetBytes(textData).Length);
+        //await stream.FlushAsync();
+        //WriteLog("Response", 6);
+        //var httpWeb = await httpWebRequest.GetResponseAsync();
+        //HttpWebResponse httpWebResponse = (HttpWebResponse)httpWeb;
+        //WriteLog("OK", 7);
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        //注册GBK编码
-        Encoding encodingUnicode = Encoding.Unicode;
+        ////await httpWebRequest.GetRequestStreamAsync().Result.WriteAsync(Encoding.UTF8.GetBytes(textData), 0, Encoding.UTF8.GetBytes(textData).Length);
 
-        var stream = await httpWebRequest.GetRequestStreamAsync();
-        await stream.WriteAsync(Encoding.UTF8.GetBytes(textData), 0, Encoding.UTF8.GetBytes(textData).Length);
-        await stream.FlushAsync();
+        ////HttpWebResponse httpWebResponse = (HttpWebResponse)(httpWebRequest.GetResponseAsync().Result);
 
-        var httpWeb = await httpWebRequest.GetResponseAsync();
-        HttpWebResponse httpWebResponse = (HttpWebResponse)httpWeb;
-        var aa = httpWebResponse.ContentType;
+        //if (HttpStatusCode.OK == httpWebResponse.StatusCode)
+        //{
+        //    StreamReader streamReader = new StreamReader(httpWebResponse.GetResponseStream(), Encoding.Unicode);
 
-        if (HttpStatusCode.OK == httpWebResponse.StatusCode)
+        //    var responseContent = streamReader.ReadToEndAsync().Result;
+
+        //    //string savePath = ApplicationData.Current.LocalFolder.Path + "/" + audioName + "." + audioType;  //本地保存路径
+        //    WriteLog("Return", 8);
+        //    return responseContent;
+
+        //    //byte[] bytes = encodingUnicode.GetBytes(responseContent);
+
+        //    //using (FileStream fs = new FileStream(savePath, FileMode.OpenOrCreate))
+        //    //{
+        //    //    var buff = Encoding.Unicode.GetBytes(responseContent);
+        //    //    fs.Write(buff, 0, buff.Length);
+        //    //}
+        //}
+        WriteLog("HttpClient", 4);
+        using (var handler = new HttpClientHandler())
         {
-            try
+            //handler.ClientCertificateOptions = ClientCertificateOption.Automatic;
+            using (var client = new HttpClient(handler))
             {
-                response.setStatus(200);
-                StreamReader streamReader = new StreamReader(httpWebResponse.GetResponseStream(), Encoding.Unicode);
+                client.DefaultRequestHeaders.Add("Method", method);
+                client.DefaultRequestHeaders.Add("Accept", accept);
+                client.DefaultRequestHeaders.Add("ContentType", content_type);
+                client.DefaultRequestHeaders.Add("ContentLength", encodingUtf8.GetBytes(textData).Length.ToString());
+                client.DefaultRequestHeaders.Add("Authorization", authHeader);
+                client.DefaultRequestHeaders.Date = time;
 
-                var responseContent = await streamReader.ReadToEndAsync();
-  GameObject text = GameObject.Find("Canvas/Text");
-        text.GetComponent<Text>().text = responseContent;
-                string savePath = ApplicationData.Current.LocalFolder.Path + "/" + audioName + "." + audioType;  //本地保存路径
-                response.setResult(responseContent);
-                byte[] bytes = encodingUnicode.GetBytes(responseContent);
-
-                using (FileStream fs = new FileStream(savePath, FileMode.OpenOrCreate))
+                using (Stream sr = new MemoryStream())
                 {
-                    var buff = Encoding.Unicode.GetBytes(responseContent);
-                    fs.Write(buff, 0, buff.Length);
-                }
-            }
-            catch (Exception ex)
-            {
+                    WriteLog("HttpContent", 5);
+                    HttpContent httpContent = new StreamContent(sr);
+                    httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(content_type);
+                    httpContent.Headers.ContentLength = encodingUtf8.GetBytes(textData).Length;
+                    WriteLog("Data", 6);
+                    sr.Write(encodingUtf8.GetBytes(textData), 0, encodingUtf8.GetBytes(textData).Length);
+                    await httpContent.CopyToAsync(sr);
+                    sr.Seek(0, SeekOrigin.Begin);
+                    await sr.FlushAsync();
+                    WriteLog("PostAsync", 7);
+                    var httpResponseMessage = await client.PostAsync(realUrl, httpContent);
 
+                    if (httpResponseMessage.EnsureSuccessStatusCode().StatusCode.ToString().ToLower() == "ok")
+                    {
+                        WriteLog("Response", 8);
+                        string responseBody = await httpResponseMessage.Content.ReadAsStringAsync();
+                        return responseBody;
+                    }
+                }
+
+                client.Dispose();
             }
+        }
+
+        return null;
+    }
+
+    private static void WriteLog(string log, int name)
+    {
+        string savePath = ApplicationData.Current.LocalFolder.Path + "/" + name + ".txt";  //本地保存路径
+        using (FileStream fs = new FileStream(savePath, FileMode.OpenOrCreate))
+        {
+            var buff = Encoding.Unicode.GetBytes(log);
+            fs.Write(buff, 0, buff.Length);
         }
     }
 
 
+    public static String ToGMTString(DateTime date)
+    {
+        string dateString = date.ToString("r");
+        return dateString;
+    }
 
     public static String MD5Base64(byte[] s)
     {
@@ -176,44 +229,43 @@ public class Testdemo : MonoBehaviour
         byte[] keyByte = encodingGbk.GetBytes(key);
 
 
-          byte[] DataBt = encodingGbk.GetBytes(data);
-            byte[] KeyBt = encodingGbk.GetBytes(key);
-            data = Encoding.UTF8.GetString(DataBt);
-            key = Encoding.UTF8.GetString(KeyBt);
+        byte[] DataBt = encodingGbk.GetBytes(data);
+        byte[] KeyBt = encodingGbk.GetBytes(key);
+        data = Encoding.UTF8.GetString(DataBt);
+        key = Encoding.UTF8.GetString(KeyBt);
 
-            string SHA1Name = MacAlgorithmNames.HmacSha1;
-            IBuffer buffUtf8Msg = CryptographicBuffer.ConvertStringToBinary(data, BinaryStringEncoding.Utf8);
-            IBuffer buffKeyMaterial = CryptographicBuffer.ConvertStringToBinary(key, BinaryStringEncoding.Utf8);
-            MacAlgorithmProvider objMacProv = MacAlgorithmProvider.OpenAlgorithm(SHA1Name);
-            CryptographicKey hmacKey = objMacProv.CreateKey(buffKeyMaterial);
-            IBuffer buffHMAC = CryptographicEngine.Sign(hmacKey, buffUtf8Msg);
-            byte[] hashValue = Buffer2Bytes(buffHMAC);
-            result = Convert.ToBase64String(hashValue);
+        string SHA1Name = MacAlgorithmNames.HmacSha1;
+        IBuffer buffUtf8Msg = CryptographicBuffer.ConvertStringToBinary(data, BinaryStringEncoding.Utf8);
+        IBuffer buffKeyMaterial = CryptographicBuffer.ConvertStringToBinary(key, BinaryStringEncoding.Utf8);
+        MacAlgorithmProvider objMacProv = MacAlgorithmProvider.OpenAlgorithm(SHA1Name);
+        CryptographicKey hmacKey = objMacProv.CreateKey(buffKeyMaterial);
+        IBuffer buffHMAC = CryptographicEngine.Sign(hmacKey, buffUtf8Msg);
+        byte[] hashValue = Buffer2Bytes(buffHMAC);
+        result = Convert.ToBase64String(hashValue);
         return result;
     }
 
-public static IBuffer Bytes2Buffer(byte[] bytes)
+    public static IBuffer Bytes2Buffer(byte[] bytes)
+    {
+        using (var dataWriter = new DataWriter())
         {
-            using (var dataWriter = new DataWriter())
-            {
-                dataWriter.WriteBytes(bytes);
-                return dataWriter.DetachBuffer();
-            }
+            dataWriter.WriteBytes(bytes);
+            return dataWriter.DetachBuffer();
         }
-        public static byte[] Buffer2Bytes(IBuffer buffer)
+    }
+    public static byte[] Buffer2Bytes(IBuffer buffer)
+    {
+        using (var dataReader = DataReader.FromBuffer(buffer))
         {
-            using (var dataReader = DataReader.FromBuffer(buffer))
-            {
-                var bytes = new byte[buffer.Length];
-                dataReader.ReadBytes(bytes);
-                return bytes;
-            }
+            var bytes = new byte[buffer.Length];
+            dataReader.ReadBytes(bytes);
+            return bytes;
         }
+    }
 }
 #else
 public class Testdemo : MonoBehaviour
 {
-
 
 }
 #endif

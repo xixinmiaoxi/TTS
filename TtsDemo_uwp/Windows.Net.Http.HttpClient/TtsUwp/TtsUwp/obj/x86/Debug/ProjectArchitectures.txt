@@ -1,0 +1,1 @@
+G:\GitHub_WorkSpace\TTS\TtsDemo_uwp\Windows.Net.Http.HttpClient\TtsUwp\TtsUwp\TtsUwp.csproj;x86
