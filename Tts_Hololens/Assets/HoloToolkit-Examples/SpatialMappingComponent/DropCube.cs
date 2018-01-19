@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using UnityEngine;
-
+using UnityEngine.VR.WSA.Input;
 
 namespace HoloToolkit.Examples.SpatialMappingComponent
 {
@@ -11,12 +11,12 @@ namespace HoloToolkit.Examples.SpatialMappingComponent
     /// </summary>
     public class DropCube : MonoBehaviour
     {
-        UnityEngine.XR.WSA.Input.GestureRecognizer recognizer;
+        GestureRecognizer recognizer;
 
         private void Start()
         {
-            recognizer = new UnityEngine.XR.WSA.Input.GestureRecognizer();
-            recognizer.SetRecognizableGestures(UnityEngine.XR.WSA.Input.GestureSettings.Tap);
+            recognizer = new GestureRecognizer();
+            recognizer.SetRecognizableGestures(GestureSettings.Tap);
             recognizer.TappedEvent += Recognizer_TappedEvent;
             recognizer.StartCapturingGestures();
         }
@@ -26,7 +26,7 @@ namespace HoloToolkit.Examples.SpatialMappingComponent
             recognizer.TappedEvent -= Recognizer_TappedEvent;
         }
 
-        private void Recognizer_TappedEvent(UnityEngine.XR.WSA.Input.InteractionSourceKind source, int tapCount, Ray headRay)
+        private void Recognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray headRay)
         {
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube); // Create a cube
             cube.transform.localScale = Vector3.one * 0.3f; // Make the cube smaller

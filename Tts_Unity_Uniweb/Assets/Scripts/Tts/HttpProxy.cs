@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Security;
 using System.Reflection;
 using System.Security.Cryptography;
-//using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using UnityEngine;
 
@@ -103,7 +103,7 @@ namespace ConsoleApp1
                 //MethodInfo priLengthMethod = httpWebRequest.Headers.GetType().GetMethod("AddWithoutValidate", BindingFlags.Instance | BindingFlags.NonPublic);
                 //priLengthMethod.Invoke(httpWebRequest.Headers, new[] { "ContentLength", bt.Length.ToString() });
                 httpWebRequest.ContentLength = bt.Length;
-               // ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
                 httpWebRequest.ServicePoint.UseNagleAlgorithm = true;
 
                 httpWebRequest.GetRequestStream().Write(bt, 0, bt.Length);
@@ -131,10 +131,10 @@ namespace ConsoleApp1
             return result;
         }
 
-        //public static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
-        //{ // Always accept
-        //    Debug.Log("accept" + certificate.GetName());
-        //    return true; //总是接受
-        //}
+        public static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        { // Always accept
+            Debug.Log("accept" + certificate.GetName());
+            return true; //总是接受
+        }
     }
 }
