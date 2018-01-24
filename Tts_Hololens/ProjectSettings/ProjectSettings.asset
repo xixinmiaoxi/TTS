@@ -546,7 +546,7 @@ PlayerSettings:
       InternetClient: True
       InternetClientServer: True
       Location: True
-      Microphone: False
+      Microphone: True
       MusicLibrary: True
       Objects3D: True
       PhoneCall: True

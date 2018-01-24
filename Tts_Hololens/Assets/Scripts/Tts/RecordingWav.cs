@@ -53,6 +53,7 @@ public class RecordingWav : MonoBehaviour
 
     public string StopRecording()
     {
+        string fileName = null;
         int audioLength = 0;
         int lastPos = Microphone.GetPosition(null);
 
@@ -70,7 +71,7 @@ public class RecordingWav : MonoBehaviour
         {
             return null;
         }
-        string fileName = System.Guid.NewGuid().ToString("N");
+        fileName = System.Guid.NewGuid().ToString("N");
         SaveWav(fileName, m_audioClip);
         return fileName;
     }

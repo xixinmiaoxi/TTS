@@ -7,6 +7,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading;
 #else
 using System;
 using System.IO;
@@ -32,37 +33,24 @@ using System.Threading.Tasks;
 
 public class Test : MonoBehaviour
 {
-    GameObject Q1;
-    GameObject Q2;
-    GameObject Q3;
-    GameObject Q4;
-    GameObject Q5;
     GameObject Q6;
     GameObject Q7;
 
     RecordingWav reWav;
 
     AudioSource source;
-    bool flag;
+
+    AudioSource VedioSource;
 
     // Use this for initialization
     void Start()
     {
-        Q1 = GameObject.Find("Canvas/Q1");
-        Q2 = GameObject.Find("Canvas/Q2");
-        Q3 = GameObject.Find("Canvas/Q3");
-        Q4 = GameObject.Find("Canvas/Q4");
-        Q5 = GameObject.Find("Canvas/Q5");
+        VedioSource = GameObject.Find("Canvas/Image").GetComponent<AudioSource>();
         Q6 = GameObject.Find("Canvas/Q6");
         Q7 = GameObject.Find("Canvas/Q7");
 
-        reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
+        //reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
 
-        Q1.GetComponent<Button>().onClick.AddListener(OnClickQ1);
-        Q2.GetComponent<Button>().onClick.AddListener(OnClickQ2);
-        Q3.GetComponent<Button>().onClick.AddListener(OnClickQ3);
-        Q4.GetComponent<Button>().onClick.AddListener(OnClickQ4);
-        Q5.GetComponent<Button>().onClick.AddListener(OnClickQ5);
         Q6.GetComponent<Button>().onClick.AddListener(OnClickQ6);
         Q7.GetComponent<Button>().onClick.AddListener(OnClickQ7);
 
@@ -72,113 +60,47 @@ public class Test : MonoBehaviour
     }
 
 #if !NETFX_CORE
-
-    private void OnClickQ1()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/1.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-    }
-
-    private void OnClickQ2()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/2.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-
-    }
-
-    private void OnClickQ3()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/3.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-
-    }
-
-    private void OnClickQ4()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/4.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-    }
-
-
-    private void OnClickQ5()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/5.wav";
-        string str = VedioToText(path);
-        Debug.Log(str);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Debug.Log(strDialogText);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-
-    }
-
     private void OnClickQ6()
     {
+        VedioSource.volume = 0.05f;
+        GameObject.Find("Sofa/Scenario/fa").AddComponent<RecordingWav>();
+        reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
         reWav.StartRecording();
     }
     private void OnClickQ7()
     {
+        StartCoroutine(OnClickQ7IEnumerator());
+    }
+
+
+    private IEnumerator OnClickQ7IEnumerator()
+    {
         string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
+        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
         string str = VedioToText(path);
-        Debug.Log(str);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
-        Debug.Log(strDialogText);
         Model model = JsonUtility.FromJson<Model>(strDialogText);
         string result = model.data.answers[0].answer;
         StartCoroutine(AnswersToAudio(result));
+        yield return 0;
+    }
+
+    public void OnClickQ7Fun()
+    {
+        //Loom.RunAsync(() =>
+        //{
+        //    Loom.QueueOnMainThread(() =>
+        //    {
+        //        string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
+        //        string str = VedioToText(path);
+        //        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
+        //        string strDialogText = DialogText(obj.result);
+        //        Model model = JsonUtility.FromJson<Model>(strDialogText);
+        //        string result = model.data.answers[0].answer;
+        //        StartCoroutine(AnswersToAudio(result));
+        //    });
+        //});
     }
 
     /// <summary>
@@ -201,7 +123,6 @@ public class Test : MonoBehaviour
             fs.Read(audioBytes, 0, (int)fs.Length);
         }
         String responseRecognize = HttpUtil.sendAsrPost(audioBytes, "pcm", 16000, urls, ak_id, ak_secret);
-
         return responseRecognize;
     }
 
@@ -264,126 +185,42 @@ public class Test : MonoBehaviour
                 audioClip = www.GetAudioClip();
                 source.clip = audioClip;
                 source.Play();
+                yield return new WaitForSeconds(audioClip.length);
+                VedioSource.volume = 0.5f;
                 if (false == source.isPlaying)
                 {
                     File.Delete(response);
                     Debug.Log("删除成功！");
                 }
             }
-            flag = false;
         }
         yield return 0;
     }
 #else
-    private void OnClickQ1()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        WriteLog("Click", 1);
-        string path = Application.streamingAssetsPath + "/1.wav";
-        WriteLog("VedioToText", 2);
-        string str = VedioToText(path);
-        WriteLog("json", 3);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        WriteLog("DialogText", 4);
-        string strDialogText = DialogText(obj.result);
-        WriteLog("FromJson", 5);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        WriteLog("StartCoroutine", 6);
-        StartCoroutine(AnswersToAudio(result));
-        WriteLog("End", 7);
-    }
-
-    private void OnClickQ2()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/2.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-
-    }
-
-    private void OnClickQ3()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/3.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-
-    }
-
-    private void OnClickQ4()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/4.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-    }
-
-
-    private void OnClickQ5()
-    {
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
-        string path = Application.streamingAssetsPath + "/5.wav";
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
-
-    }
-
     private void OnClickQ6()
     {
+        VedioSource.volume = 0.05f;
+       GameObject.Find("Sofa/Scenario/fa").AddComponent<RecordingWav>();
+        reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
         reWav.StartRecording();
     }
     private void OnClickQ7()
     {
+        StartCoroutine(OnClickQ7IEnumerator());
+    }
+
+    private IEnumerator OnClickQ7IEnumerator()
+    {
         string path = ApplicationData.Current.LocalFolder.Path + "/" + reWav.StopRecording() + ".wav";
-        if (true == flag)
-        {
-            return;
-        }
-        flag = true;
+        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
         Model model = JsonUtility.FromJson<Model>(strDialogText);
         string result = model.data.answers[0].answer;
         StartCoroutine(AnswersToAudio(result));
+        VedioSource.volume = 0.5f;
+        yield return 0;
     }
 
     private static void WriteLog(string log, int name)
@@ -488,7 +325,6 @@ public class Test : MonoBehaviour
                 //    Debug.Log("删除成功！");
                 //}
             }
-            flag = false;
         }
         yield return 0;
     }
