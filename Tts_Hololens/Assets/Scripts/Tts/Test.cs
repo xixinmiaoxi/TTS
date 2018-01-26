@@ -42,14 +42,14 @@ public class Test : MonoBehaviour
 
     AudioSource VedioSource;
 
+    string Result;
+
     // Use this for initialization
     void Start()
     {
         VedioSource = GameObject.Find("Canvas/Image").GetComponent<AudioSource>();
         Q6 = GameObject.Find("Canvas/Q6");
         Q7 = GameObject.Find("Canvas/Q7");
-
-        //reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
 
         Q6.GetComponent<Button>().onClick.AddListener(OnClickQ6);
         Q7.GetComponent<Button>().onClick.AddListener(OnClickQ7);
@@ -67,9 +67,30 @@ public class Test : MonoBehaviour
         reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
         reWav.StartRecording();
     }
+
     private void OnClickQ7()
     {
-        StartCoroutine(OnClickQ7IEnumerator());
+        //StartCoroutine(OnClickQ7IEnumerator());
+
+        string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
+        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
+    }
+    private IEnumerator OnClickQ7WaitForThreadIEnumerator(string path)
+    {
+        Result = null;
+        Thread td = new Thread(new ParameterizedThreadStart(OnClickQ7ThreadFun));
+        td.Start(path);
+        while (true)
+        {
+            if (Result != null)
+            {
+                break;
+            }
+            yield return 0;
+        }
+        StartCoroutine(AnswersToAudio(Result));
+        yield return 0;
     }
 
 
@@ -86,22 +107,21 @@ public class Test : MonoBehaviour
         yield return 0;
     }
 
-    public void OnClickQ7Fun()
+    private void OnClickQ7ThreadFun(object path)
     {
-        //Loom.RunAsync(() =>
-        //{
-        //    Loom.QueueOnMainThread(() =>
-        //    {
-        //        string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
-        //        string str = VedioToText(path);
-        //        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        //        string strDialogText = DialogText(obj.result);
-        //        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        //        string result = model.data.answers[0].answer;
-        //        StartCoroutine(AnswersToAudio(result));
-        //    });
-        //});
+        string reWavPath = (string)path;
+        string str = VedioToText(reWavPath);
+        Debug.Log("str: " + str);
+        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
+        string strDialogText = DialogText(obj.result);
+        Debug.Log("strDialogText: " + strDialogText);
+        Model model = JsonUtility.FromJson<Model>(strDialogText);
+        string result = model.data.answers[0].answer;
+        Result = result;
     }
+
+
+
 
     /// <summary>
     /// 语音转文字
@@ -196,17 +216,54 @@ public class Test : MonoBehaviour
         }
         yield return 0;
     }
+
 #else
     private void OnClickQ6()
     {
         VedioSource.volume = 0.05f;
-       GameObject.Find("Sofa/Scenario/fa").AddComponent<RecordingWav>();
+        GameObject.Find("Sofa/Scenario/fa").AddComponent<RecordingWav>();
         reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
         reWav.StartRecording();
     }
+
     private void OnClickQ7()
     {
-        StartCoroutine(OnClickQ7IEnumerator());
+        //StartCoroutine(OnClickQ7IEnumerator());
+
+        string path = ApplicationData.Current.LocalFolder.Path + "/" + reWav.StopRecording() + ".wav";
+        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
+    }
+    private IEnumerator OnClickQ7WaitForThreadIEnumerator(string path)
+    {
+        string vedioToText = null;
+        Task t = new Task(() =>
+        {
+            vedioToText = OnClickQ7ThreadFun(path);
+        });
+        t.Start();
+        yield return 0;
+        while (true)
+        {
+            if (vedioToText != null)
+            {
+                break;
+            }
+            yield return 0;
+        }
+        StartCoroutine(AnswersToAudio(vedioToText));
+        yield return 0;
+    }
+
+    private string OnClickQ7ThreadFun(object path)
+    {
+        string reWavPath = (string)path;
+        string str = VedioToText(reWavPath);
+        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
+        string strDialogText = DialogText(obj.result);
+        Model model = JsonUtility.FromJson<Model>(strDialogText);
+        string result = model.data.answers[0].answer;
+        return result;
     }
 
     private IEnumerator OnClickQ7IEnumerator()
