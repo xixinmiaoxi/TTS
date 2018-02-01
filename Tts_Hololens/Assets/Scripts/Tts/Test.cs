@@ -8,6 +8,9 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading;
+using System.Security.Permissions;
+using Microsoft.Win32;
+using System.Security;
 #else
 using System;
 using System.IO;
@@ -44,10 +47,11 @@ public class Test : MonoBehaviour
 
     string Result;
 
+    Image TestImage;
     // Use this for initialization
     void Start()
     {
-        VedioSource = GameObject.Find("Canvas/Image").GetComponent<AudioSource>();
+        VedioSource = GameObject.Find("Sofa/Scenario/TV/Canvas_TV/Image_TV").GetComponent<AudioSource>();
         Q6 = GameObject.Find("Canvas/Q6");
         Q7 = GameObject.Find("Canvas/Q7");
 
@@ -57,6 +61,13 @@ public class Test : MonoBehaviour
         source = GameObject.Find("Sofa/Scenario/fa").GetComponent<AudioSource>();
         source.loop = false;
         source.playOnAwake = false;
+
+        TestImage = GameObject.FindWithTag("Test").GetComponent<Image>();
+    }
+
+    private void Update()
+    {
+        TestImage.transform.Rotate(Vector3.forward,0.05f);
     }
 
 #if !NETFX_CORE
@@ -70,11 +81,12 @@ public class Test : MonoBehaviour
 
     private void OnClickQ7()
     {
-        //StartCoroutine(OnClickQ7IEnumerator());
+        //InitializeFallbackSettings();
+        StartCoroutine(OnClickQ7IEnumerator());
 
-        string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
-        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
-        StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
+        //string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
+        //Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        //StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
     }
     private IEnumerator OnClickQ7WaitForThreadIEnumerator(string path)
     {
@@ -120,7 +132,36 @@ public class Test : MonoBehaviour
         Result = result;
     }
 
-
+    [RegistryPermission(SecurityAction.Assert, Read = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework")]
+    private static void InitializeFallbackSettings()
+    {
+        bool allowFallback = false;
+        try
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework"))
+            {
+                try
+                {
+                    if (key.GetValueKind("LegacyWPADSupport") == RegistryValueKind.DWord)
+                    {
+                        allowFallback = ((int)key.GetValue("LegacyWPADSupport")) == 1;
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                }
+                catch (IOException)
+                {
+                }
+            }
+        }
+        catch (SecurityException)
+        {
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+    }
 
 
     /// <summary>

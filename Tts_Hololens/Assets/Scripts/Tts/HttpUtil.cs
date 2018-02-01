@@ -105,6 +105,7 @@ namespace TtsInterface
             String signature = HMACSha1(stringToSign, ak_secret);
             // 3.得到 authorization header
             String authHeader = "Dataplus " + ak_id + ":" + signature;
+
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(realUrl);
             httpWebRequest.Method = method;
             httpWebRequest.Accept = accept;

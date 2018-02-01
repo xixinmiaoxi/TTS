@@ -42,6 +42,7 @@ public class RecordingWav : MonoBehaviour
     }
     public void StartRecording()
     {
+        Debug.Log("StartRecording");
         Microphone.End(null);
         foreach (string d in Microphone.devices)
         {
@@ -53,6 +54,7 @@ public class RecordingWav : MonoBehaviour
 
     public string StopRecording()
     {
+        Debug.Log("StopRecording");
         string fileName = null;
         int audioLength = 0;
         int lastPos = Microphone.GetPosition(null);
