@@ -48,6 +48,8 @@ public class Test : MonoBehaviour
     string Result;
 
     Image TestImage;
+
+    UITest UITest;
     // Use this for initialization
     void Start()
     {
@@ -63,11 +65,13 @@ public class Test : MonoBehaviour
         source.playOnAwake = false;
 
         TestImage = GameObject.FindWithTag("Test").GetComponent<Image>();
+        UITest = GameObject.Find("Canvas_Info").GetComponent<UITest>();
+        UITest.Init();
     }
 
     private void Update()
     {
-        TestImage.transform.Rotate(Vector3.forward,0.05f);
+        // TestImage.transform.Rotate(Vector3.forward,0.05f);
     }
 
 #if !NETFX_CORE
@@ -82,11 +86,11 @@ public class Test : MonoBehaviour
     private void OnClickQ7()
     {
         //InitializeFallbackSettings();
-        StartCoroutine(OnClickQ7IEnumerator());
+        //StartCoroutine(OnClickQ7IEnumerator());
 
-        //string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
-        //Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
-        //StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
+        string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
+        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
     }
     private IEnumerator OnClickQ7WaitForThreadIEnumerator(string path)
     {
@@ -101,6 +105,7 @@ public class Test : MonoBehaviour
             }
             yield return 0;
         }
+        UITest.SetData(Result);
         StartCoroutine(AnswersToAudio(Result));
         yield return 0;
     }
@@ -196,7 +201,6 @@ public class Test : MonoBehaviour
         String bdStr = "{\"projectId" + "\"" + ":" + 4649 + "," + "\"question" + "\"" + ":" + "\"" + text + "\"}";
 
         String responseStr = HttpProxy.sendRequest(urlStr, bdStr, ak_id, ak_secret);
-
         return responseStr;
     }
 
@@ -292,6 +296,7 @@ public class Test : MonoBehaviour
             }
             yield return 0;
         }
+        UITest.SetData(vedioToText);
         StartCoroutine(AnswersToAudio(vedioToText));
         yield return 0;
     }
