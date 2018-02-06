@@ -175,14 +175,14 @@ public class UITest : MonoBehaviour
         Photo.sprite = null;
         Team.sprite = null;
 
+        AsyncImageDownload.Instance.SetAsyncImage(PhotoUrl, Photo);
+        AsyncImageDownload.Instance.SetAsyncImage(TeamUrl, Team);
+
         foreach (Transform trans in tra)
         {
             trans.gameObject.SetActive(true);
             yield return new WaitForSeconds(1);
         }
-
-        AsyncImageDownload.Instance.SetAsyncImage(PhotoUrl, Photo);
-        AsyncImageDownload.Instance.SetAsyncImage(TeamUrl, Team);
 
         Name.GetComponent<SubtitleTest>().SetData(NameText);
         yield return new WaitForSeconds(1);

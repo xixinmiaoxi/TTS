@@ -1,0 +1,176 @@
+fileFormatVersion: 2
+guid: b35b313fca54c234aa8fb423f934e69d
+timeCreated: 18446744011573954816
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: eyeL_lo
+    100002: eyeR_lo
+    100004: Head
+    100006: Jaw
+    100008: L_Brow
+    100010: L_Chek
+    100012: L_DLip
+    100014: L_Lip
+    100016: L_LoLid
+    100018: L_ULip
+    100020: L_UpLid
+    100022: Neck
+    100024: Null
+    100026: R_Brow
+    100028: R_Chek
+    100030: R_DLip
+    100032: R_Lip
+    100034: R_LoLid
+    100036: R_ULip
+    100038: R_UpLid
+    100040: teethLower
+    100042: teethUpper
+    100044: tongue
+    100046: //RootNode
+    400000: eyeL_lo
+    400002: eyeR_lo
+    400004: Head
+    400006: Jaw
+    400008: L_Brow
+    400010: L_Chek
+    400012: L_DLip
+    400014: L_Lip
+    400016: L_LoLid
+    400018: L_ULip
+    400020: L_UpLid
+    400022: Neck
+    400024: Null
+    400026: R_Brow
+    400028: R_Chek
+    400030: R_DLip
+    400032: R_Lip
+    400034: R_LoLid
+    400036: R_ULip
+    400038: R_UpLid
+    400040: teethLower
+    400042: teethUpper
+    400044: tongue
+    400046: //RootNode
+    2300000: eyeL_lo
+    2300002: eyeR_lo
+    2300004: teethLower
+    2300006: teethUpper
+    2300008: tongue
+    3300000: eyeL_lo
+    3300002: eyeR_lo
+    3300004: teethLower
+    3300006: teethUpper
+    3300008: tongue
+    4300000: achest_1
+    4300002: teethUpper
+    4300004: tongue
+    4300006: eyeL_lo
+    4300008: eyeR_lo
+    4300010: teethLower
+    7400000: sp_source
+    11100000: //RootNode
+    13700000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 0
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: sp_source
+      takeName: 
+      firstFrame: 0
+      lastFrame: 22
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 0.01
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+    normalCalculationMode: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

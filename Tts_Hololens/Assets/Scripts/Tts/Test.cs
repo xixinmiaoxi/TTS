@@ -50,17 +50,21 @@ public class Test : MonoBehaviour
     Image TestImage;
 
     UITest UITest;
+
+    Animation animations;
     // Use this for initialization
     void Start()
     {
         VedioSource = GameObject.Find("Sofa/Scenario/TV/Canvas_TV/Image_TV").GetComponent<AudioSource>();
+        animations = GameObject.Find("Sofa/Scenario/woman").GetComponent<Animation>();
+        animations.Stop();
         Q6 = GameObject.Find("Canvas/Q6");
         Q7 = GameObject.Find("Canvas/Q7");
 
         Q6.GetComponent<Button>().onClick.AddListener(OnClickQ6);
         Q7.GetComponent<Button>().onClick.AddListener(OnClickQ7);
 
-        source = GameObject.Find("Sofa/Scenario/fa").GetComponent<AudioSource>();
+        source = GameObject.Find("Sofa/Scenario/fb").GetComponent<AudioSource>();
         source.loop = false;
         source.playOnAwake = false;
 
@@ -78,15 +82,15 @@ public class Test : MonoBehaviour
     private void OnClickQ6()
     {
         VedioSource.volume = 0.05f;
-        GameObject.Find("Sofa/Scenario/fa").AddComponent<RecordingWav>();
-        reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
+        GameObject.Find("Sofa/Scenario/fb").AddComponent<RecordingWav>();
+        reWav = GameObject.Find("Sofa/Scenario/fb").GetComponent<RecordingWav>();
         reWav.StartRecording();
     }
 
     private void OnClickQ7()
     {
         string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
-        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        Destroy(GameObject.Find("Sofa/Scenario/fb").GetComponent<RecordingWav>());
         StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
     }
     private IEnumerator OnClickQ7WaitForThreadIEnumerator(string path)
@@ -203,7 +207,11 @@ public class Test : MonoBehaviour
                 audioClip = www.GetAudioClip();
                 source.clip = audioClip;
                 source.Play();
+                animations.Play();
+                animations["sp_source"].speed = 0.5f;
                 yield return new WaitForSeconds(audioClip.length);
+                animations.Stop();
+                animations["sp_source"].time = 0;
                 VedioSource.volume = 0.5f;
                 if (false == source.isPlaying)
                 {
@@ -219,8 +227,8 @@ public class Test : MonoBehaviour
     private void OnClickQ6()
     {
         VedioSource.volume = 0.05f;
-        GameObject.Find("Sofa/Scenario/fa").AddComponent<RecordingWav>();
-        reWav = GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>();
+        GameObject.Find("Sofa/Scenario/fb").AddComponent<RecordingWav>();
+        reWav = GameObject.Find("Sofa/Scenario/fb").GetComponent<RecordingWav>();
         reWav.StartRecording();
     }
 
@@ -229,7 +237,7 @@ public class Test : MonoBehaviour
         //StartCoroutine(OnClickQ7IEnumerator());
 
         string path = ApplicationData.Current.LocalFolder.Path + "/" + reWav.StopRecording() + ".wav";
-        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        Destroy(GameObject.Find("Sofa/Scenario/fb").GetComponent<RecordingWav>());
         StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
     }
     private IEnumerator OnClickQ7WaitForThreadIEnumerator(string path)
@@ -269,7 +277,7 @@ public class Test : MonoBehaviour
     private IEnumerator OnClickQ7IEnumerator()
     {
         string path = ApplicationData.Current.LocalFolder.Path + "/" + reWav.StopRecording() + ".wav";
-        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
+        Destroy(GameObject.Find("Sofa/Scenario/fb").GetComponent<RecordingWav>());
         string str = VedioToText(path);
         ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
         string strDialogText = DialogText(obj.result);
@@ -371,11 +379,17 @@ public class Test : MonoBehaviour
                 audioClip = www.GetAudioClip();
                 source.clip = audioClip;
                 source.Play();
-                //if (false == source.isPlaying)
-                //{
-                //    File.Delete(response);
-                //    Debug.Log("删除成功！");
-                //}
+                animations.Play();
+                animations["sp_source"].speed = 0.5f;
+                yield return new WaitForSeconds(audioClip.length);
+                animations.Stop();
+                animations["sp_source"].time = 0;
+                VedioSource.volume = 0.5f;
+                if (false == source.isPlaying)
+                {
+                    File.Delete(response);
+                    Debug.Log("删除成功！");
+                }
             }
         }
         yield return 0;
