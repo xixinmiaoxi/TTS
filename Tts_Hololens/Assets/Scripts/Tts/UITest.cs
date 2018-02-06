@@ -13,21 +13,27 @@ public class UITest : MonoBehaviour
     public Text Rebound_Lable;
     public Text Assisting_Lable;
 
-    public Text Height_Lable;
-    public Text Weight_Lable;
-    public Text Age_Lable;
+    //public Text Height_Lable;
+    //public Text Weight_Lable;
+    //public Text Age_Lable;
 
     public Text Score;
     public Text Rebound;
     public Text Assisting;
+    public Text Name;
+    public Image Photo;
+    public Image Team;
 
     private string ScoreText;
     private string ReboundText;
     private string AssistingText;
+    private string NameText;
+    private string PhotoUrl;
+    private string TeamUrl;
 
-    public Text Height;
-    public Text Weight;
-    public Text Age;
+    //public Text Height;
+    //public Text Weight;
+    //public Text Age;
 
     public GameObject UI;
     Transform tra;
@@ -97,8 +103,17 @@ public class UITest : MonoBehaviour
         ReadText.text = null;
     }
 
+    /// <summary>
+    /// 设置内容，此处为解析字符串，后续会改为解析Json
+    /// </summary>
+    /// <param name="data"></param>
     public void SetData(string data)
     {
+        if (null == data || !data.Contains("Data"))
+        {
+            return;
+        }
+
         if (data.Contains("得分"))
         {
             ScoreText = data.Substring(data.IndexOf("分") + 1, 4);
@@ -111,6 +126,18 @@ public class UITest : MonoBehaviour
         {
             AssistingText = data.Substring(data.IndexOf("攻") + 1, 3);
         }
+        if (data.Contains("Name"))
+        {
+            NameText = data.Substring(data.IndexOf("Name:") + 5, data.IndexOf("Team") - 5 - data.IndexOf("Name:") - 1);
+        }
+        if (data.Contains("Team"))
+        {
+            TeamUrl = data.Substring(data.IndexOf("Team:") + 5, data.IndexOf("Pic") - 5 - data.IndexOf("Team:") - 1);
+        }
+        if (data.Contains("Pic"))
+        {
+            PhotoUrl = data.Substring(data.IndexOf("Pic:") + 4, data.IndexOf(")") - 4 - data.IndexOf("Pic:"));
+        }
         LoadData();
     }
 
@@ -122,6 +149,7 @@ public class UITest : MonoBehaviour
     public IEnumerator LoadDataIEnumerator()
     {
         float temp = 0;
+        float timeLong = 0;
         while (true)
         {
             if (temp > 1)
@@ -132,7 +160,6 @@ public class UITest : MonoBehaviour
             else
             {
                 temp += Time.deltaTime;
-                Debug.Log(temp);
                 UI.transform.Rotate(Vector3.forward, 360.0f / (1 / 0.02f));
                 UI.transform.position = Vector3.Lerp(UIStartPosition, UIEndPosition, temp);
                 UI.transform.localScale = Vector3.Lerp(UIStartScale, UIEndScale, temp);
@@ -141,28 +168,62 @@ public class UITest : MonoBehaviour
         }
         yield return new WaitForSeconds(1);
 
+        Name.text = null;
+        Score.text = null;
+        Rebound.text = null;
+        Assisting.text = null;
+        Photo.sprite = null;
+        Team.sprite = null;
+
         foreach (Transform trans in tra)
         {
             trans.gameObject.SetActive(true);
             yield return new WaitForSeconds(1);
         }
 
-        Score_Lable.GetComponent<AnimTest>().StartEffect();
+        AsyncImageDownload.Instance.SetAsyncImage(PhotoUrl, Photo);
+        AsyncImageDownload.Instance.SetAsyncImage(TeamUrl, Team);
+
+        Name.GetComponent<SubtitleTest>().SetData(NameText);
+        yield return new WaitForSeconds(1);
+
+        Score_Lable.GetComponent<SubtitleTest>().SetData("得分");
         yield return new WaitForSeconds(1);
 
         Score.GetComponent<SubtitleTest>().SetData(ScoreText);
         yield return new WaitForSeconds(1);
 
-        Rebound_Lable.GetComponent<AnimTest>().StartEffect();
+        Rebound_Lable.GetComponent<SubtitleTest>().SetData("篮板");
         yield return new WaitForSeconds(1);
 
         Rebound.GetComponent<SubtitleTest>().SetData(ReboundText);
         yield return new WaitForSeconds(1);
 
-        Assisting_Lable.GetComponent<AnimTest>().StartEffect();
+        Assisting_Lable.GetComponent<SubtitleTest>().SetData("助攻");
         yield return new WaitForSeconds(1);
 
         Assisting.GetComponent<SubtitleTest>().SetData(AssistingText);
+
+        while (true)
+        {
+            if (timeLong > 10)
+            {
+                timeLong = 0;
+                break;
+            }
+            else
+            {
+                timeLong += Time.deltaTime;
+                yield return new WaitForSeconds(0.02f);
+            }
+        }
+        foreach (Transform trans in tra)
+        {
+            trans.gameObject.SetActive(false);
+        }
+
+        UI.transform.localScale = UIStartScale;
+        UI.transform.position = UIStartPosition;
         yield return 0;
     }
 }

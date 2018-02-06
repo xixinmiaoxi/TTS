@@ -85,9 +85,6 @@ public class Test : MonoBehaviour
 
     private void OnClickQ7()
     {
-        //InitializeFallbackSettings();
-        //StartCoroutine(OnClickQ7IEnumerator());
-
         string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
         Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
         StartCoroutine(OnClickQ7WaitForThreadIEnumerator(path));
@@ -106,21 +103,8 @@ public class Test : MonoBehaviour
             yield return 0;
         }
         UITest.SetData(Result);
-        StartCoroutine(AnswersToAudio(Result));
-        yield return 0;
-    }
-
-
-    private IEnumerator OnClickQ7IEnumerator()
-    {
-        string path = Application.persistentDataPath + "/" + reWav.StopRecording() + ".wav";
-        Destroy(GameObject.Find("Sofa/Scenario/fa").GetComponent<RecordingWav>());
-        string str = VedioToText(path);
-        ModelTest obj = JsonUtility.FromJson<ModelTest>(str);
-        string strDialogText = DialogText(obj.result);
-        Model model = JsonUtility.FromJson<Model>(strDialogText);
-        string result = model.data.answers[0].answer;
-        StartCoroutine(AnswersToAudio(result));
+        string audioText = Result.Remove(0, Result.IndexOf(")") + 1);
+        StartCoroutine(AnswersToAudio(audioText));
         yield return 0;
     }
 
@@ -135,37 +119,6 @@ public class Test : MonoBehaviour
         Model model = JsonUtility.FromJson<Model>(strDialogText);
         string result = model.data.answers[0].answer;
         Result = result;
-    }
-
-    [RegistryPermission(SecurityAction.Assert, Read = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework")]
-    private static void InitializeFallbackSettings()
-    {
-        bool allowFallback = false;
-        try
-        {
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework"))
-            {
-                try
-                {
-                    if (key.GetValueKind("LegacyWPADSupport") == RegistryValueKind.DWord)
-                    {
-                        allowFallback = ((int)key.GetValue("LegacyWPADSupport")) == 1;
-                    }
-                }
-                catch (UnauthorizedAccessException)
-                {
-                }
-                catch (IOException)
-                {
-                }
-            }
-        }
-        catch (SecurityException)
-        {
-        }
-        catch (ObjectDisposedException)
-        {
-        }
     }
 
 
@@ -297,7 +250,8 @@ public class Test : MonoBehaviour
             yield return 0;
         }
         UITest.SetData(vedioToText);
-        StartCoroutine(AnswersToAudio(vedioToText));
+        string audioText = vedioToText.Remove(0, vedioToText.IndexOf(")") + 1);
+        StartCoroutine(AnswersToAudio(audioText));
         yield return 0;
     }
 
@@ -358,7 +312,6 @@ public class Test : MonoBehaviour
             fs.Read(audioBytes, 0, (int)fs.Length);
         }
         String responseRecognize = HttpUtil.sendAsrPost(audioBytes, "pcm", 16000, urls, ak_id, ak_secret).Result;
-        WriteLog(responseRecognize, 8);
         return responseRecognize;
     }
 
@@ -369,9 +322,7 @@ public class Test : MonoBehaviour
 
         String urlStr = "https://nlsapi.aliyun.com/manage/qas?action=single:prepub:qa";
         String bdStr = "{\"projectId" + "\"" + ":" + 4649 + "," + "\"question" + "\"" + ":" + "\"" + text + "\"}";
-        WriteLog(text, 9);
         String responseStr = HttpProxy.sendRequest(urlStr, bdStr, ak_id, ak_secret).Result;
-        WriteLog(responseStr, 10);
         return responseStr;
     }
 
@@ -408,9 +359,7 @@ public class Test : MonoBehaviour
 
 
         string fileName = System.Guid.NewGuid().ToString("N");
-        WriteLog(content, 11);
         string response = HttpUtil.sendTtsPost(content, ttsRequest.getEncodeType(), fileName, ttsUrlSpeak, ak_id, ak_secret).Result;
-        WriteLog(response, 12);
         if (null != response && 0 < response.Length)
         {
             AudioClip audioClip;
