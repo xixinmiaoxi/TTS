@@ -1,11 +1,13 @@
 ﻿#if !NETFX_CORE 
 using System;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 #else
 using System;
 using System.IO;
 using Windows.Storage;
+using System.Collections;
 using UnityEngine;
 #endif
 
@@ -38,7 +40,15 @@ public class RecordingWav : MonoBehaviour
     // Update is called once per frame  
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        }
 
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            Debug.Log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        }
     }
     public void StartRecording()
     {
@@ -50,6 +60,7 @@ public class RecordingWav : MonoBehaviour
         }
 
         m_audioClip = Microphone.Start(null, false, 60, SamplingRate);
+        StartCoroutine("Volume");
     }
 
     public string StopRecording()
@@ -74,8 +85,41 @@ public class RecordingWav : MonoBehaviour
             return null;
         }
         fileName = System.Guid.NewGuid().ToString("N");
+        StopCoroutine("Volume");
         SaveWav(fileName, m_audioClip);
         return fileName;
+    }
+
+    public IEnumerator Volume()
+    {
+        while (true)
+        {
+            if (Microphone.IsRecording(null))
+            {
+                // 采样数
+                int sampleSize = 128;
+                float[] samples = new float[sampleSize];
+                int startPosition = Microphone.GetPosition(null) - (sampleSize + 1);
+                // 得到数据
+                if (startPosition >= 128)
+                {
+                    m_audioClip.GetData(samples, startPosition);
+                    Debug.Log(m_audioClip.length);
+                    // Getting a peak on the last 128 samples
+                    float levelMax = 0;
+                    for (int i = 0; i < sampleSize; ++i)
+                    {
+                        float wavePeak = samples[i];
+                        if (levelMax < wavePeak)
+                            levelMax = wavePeak;
+                    }
+                    Debug.Log("音量： " + levelMax * 100);
+                    //yield return levelMax * 99;
+                    yield return new WaitForSeconds(0.5f);
+                }
+            }
+            yield return 0;
+        }
     }
 
     bool SaveWav(string filename, AudioClip clip)
