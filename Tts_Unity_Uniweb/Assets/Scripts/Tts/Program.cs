@@ -17,8 +17,6 @@ namespace ConsoleApp1
             String tts_text = "32号谁啊，我怎么没见过？";
             //请使用https://ak-console.aliyun.com/ 页面获取的Access 信息
             //请提前开通智能语音服务(https://data.aliyun.com/product/nls)
-            //String ak_id = "LTAILNHYi9oS9tmi";
-            //String ak_secret = "hZH1gI8FYIeOPc7rFxtQl8geg7aaGW";
 
             //设置TTS的参数,详细参数说明详见文档部分2.1 参数配置
             Program ttsDemo = new Program();
